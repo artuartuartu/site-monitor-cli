@@ -1,48 +1,76 @@
 package com.arthurmartins.monitor;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Scanner;
 
 public class App {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final httpChecker checker = new httpChecker();
+    public static boolean continuar = true;
+
     public static void main(String[] args) {
-        httpChecker checker = new httpChecker();
-        List<String> sitesParaVerificar = new ArrayList<>();
+        exibirBanner();
 
-        System.out.println("=== Site Monitor: Monitor de Disponibilidade de Sites ===\n");
+        while (continuar) {
+            exibirMenu();
 
-        // 1. Prioridade: Argumentos do Terminal
-        if (args.length > 0) {
-            System.out.println("Argumento de linha de comando detectado.");
-            sitesParaVerificar.add(args[0]);
-        }
-        // 2. Segunda opção: Tentar ler o arquivo (vamos implementar a lógica de arquivo logo mais)
-        else {
-            System.out.println("Verificando arquivo 'sites.txt'...");
-            // Por enquanto, vamos simular uma lista vazia ou manual
-            // sitesParaVerificar = FileScanner.read("sites.txt");
-            System.out.println("⚠️  Leitura de arquivo ainda não implementada. Use: java -jar app.jar <url>");
-        }
+            if (!scanner.hasNextLine()) break;
 
-        // 3. Execução da verificação
-        if (sitesParaVerificar.isEmpty()) {
-            System.out.println("\n❌ Erro: Nenhuma URL encontrada para monitorar.");
-        } else {
-            for (String site : sitesParaVerificar) {
-                validarSite(checker, site);
+            String opcao = scanner.nextLine();
+
+            switch (opcao) {
+                case "1" -> processarUrl();
+                case "2" -> processarArquivo();
+                case "0" -> {
+                    System.out.println("\nEncerrando...");
+                    continuar = false;
+                }
+                default -> System.out.println("\nOpção inválida! Tente novamente.");
             }
         }
     }
 
-    private static void validarSite(httpChecker checker, String url) {
-        // Pequeno ajuste para garantir que a URL seja válida para o HttpClient
-        String urlFormatada = url.startsWith("http") ? url : "https://" + url;
+    private static void exibirBanner() {
+        System.out.println("""
+        =======================================================
+           SITE-MONITOR-CLI: MONITOR DE DISPONIBILIDADE
+        =======================================================
+        """);
+    }
 
-        System.out.print("Verificando [" + urlFormatada + "]... ");
+    private static void exibirMenu() {
+        System.out.println("\nEscolha uma opção:");
+        System.out.println("1) Verificar uma URL única");
+        System.out.println("2) Ler lista de sites de um arquivo");
+        System.out.println("0) Finalizar");
+        System.out.print("\n> Seleção: ");
+    }
+
+    private static void processarUrl() {
+        System.out.print("\nDigite a URL para verificar (ex: google.com): ");
+        String url = scanner.nextLine();
+
+        if (url.isBlank()) {
+            System.out.println(" Erro: A URL não pode estar vazia.");
+            return;
+        }
+
+        validarSite(url);
+    }
+
+    private static void processarArquivo() {
+        System.out.println("\n");
+        continuar = false;
+    }
+
+    private static void validarSite(String url) {
+        String urlFormatada = url.startsWith("http") ? url : "https://" + url;
+        System.out.println("\nVerificando...");
 
         if (checker.isSiteUp(urlFormatada)) {
-            System.out.println("✅ ONLINE");
+            System.out.println("STATUS: ONLINE [" + urlFormatada + "]");
         } else {
-            System.out.println("❌ OFFLINE ou inacessível");
+            System.out.println("STATUS: OFFLINE ou inacessível");
         }
+        continuar = false;
     }
 }
