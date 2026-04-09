@@ -25,7 +25,6 @@ public class httpChecker {
             return response.statusCode() >= 200 && response.statusCode() < 400;
 
         } catch (Exception e) {
-            // Se der timeout, erro de DNS ou o site estiver fora do ar
             return false;
         }
     }
