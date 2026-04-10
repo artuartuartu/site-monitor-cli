@@ -1,6 +1,8 @@
 package com.arthurmartins.monitor;
 
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
 
 public class App {
     private static final Scanner scanner = new Scanner(System.in);
@@ -37,6 +39,27 @@ public class App {
         """);
     }
 
+    private static void processarArquivo() {
+        System.out.print("\nDigite o nome do arquivo (ex: sites.txt): ");
+        String nomeArquivo = scanner.nextLine();
+
+        List<String> sites = FileScanner.readSites(nomeArquivo);
+
+        if (sites.isEmpty()) {
+            System.out.println("Nenhuma URL para processar.");
+        } else {
+            System.out.println("\n--- Iniciando Verificação em Lote ---");
+            for (String site : sites) {
+                String urlLimpa = site.trim();
+                if (!urlLimpa.isEmpty()) {
+                    validarSite(urlLimpa);
+                }
+            }
+            System.out.println("--- Verificação Concluída ---");
+        }
+        continuar = false;
+    }
+
     private static void exibirMenu() {
         System.out.println("\nEscolha uma opção:");
         System.out.println("1) Verificar uma URL única");
@@ -55,11 +78,6 @@ public class App {
         }
 
         validarSite(url);
-    }
-
-    private static void processarArquivo() {
-        System.out.println("\n");
-        continuar = false;
     }
 
     private static void validarSite(String url) {
