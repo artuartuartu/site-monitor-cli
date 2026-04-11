@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
+//import java.time.Duration;
 
 public final class HttpChecker {
     /** Tempo limite para a conexão em segundos. */
@@ -37,8 +37,15 @@ public final class HttpChecker {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
-                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
-                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                    .header("User-Agent", "Mozilla/5.0 "
+                            +
+                            "(Windows NT 10.0; Win64; x64) Chrome/120.0.0.0")
+                    .header("Accept", "text/html,application/xhtml+xml,"
+                            +
+                            "application/xml;q=0.9,image/webp,*/*;q=0.8")
+                    .header("Accept-Language", "en-US,en;q=0.5")
+                    .GET()
+//                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                     .build();
 
             HttpResponse<Void> response = CLIENT.send(request,
