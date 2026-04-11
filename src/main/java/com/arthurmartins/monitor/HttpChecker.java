@@ -1,0 +1,48 @@
+package com.arthurmartins.monitor;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+
+public class HttpChecker {
+    /** Tempo limite para a conexão em segundos. */
+    private static final int TIMEOUT_SECONDS = 5;
+    /** Código de status que indica que o site está online. */
+    private static final int STATUS_OK = 200;
+    /** Código de status que indica que o site está offline. */
+    private static final int STATUS_NOT_OK = 400;
+
+    /** * Cliente HTTP utilizado para enviar as requisições de verificação.
+     * Configurado para seguir redirecionamentos automaticamente.
+     */
+    private final HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .build();
+
+    /**
+     * Verifica se um site está online enviando uma requisição HTTP HEAD.
+     * @param url A URL completa do site a ser verificado.
+     * @return true se o site retornar um código de status de sucesso,
+     * false caso o site esteja fora do ar ou ocorra um erro de conexão.
+     */
+    public boolean isSiteUp(final String url) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                    .build();
+
+            HttpResponse<Void> response = client.send(request,
+                    HttpResponse.BodyHandlers.discarding());
+
+            return response.statusCode() >= STATUS_OK
+                    && response.statusCode() < STATUS_NOT_OK;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
