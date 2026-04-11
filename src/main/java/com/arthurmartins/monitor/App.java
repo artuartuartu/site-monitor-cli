@@ -6,8 +6,6 @@ import java.util.List;
 public final class App {
     /** Scanner para leitura de entradas do usuário via console. */
     private static final Scanner SCANNER = new Scanner(System.in);
-    /** Instância do verificador HTTP para validar o status dos sites. */
-    private static final HttpChecker CHECKER = new HttpChecker();
     /** Variável para gerir o fluxo do prograna. */
     private static boolean continuar = true;
 
@@ -116,7 +114,7 @@ public final class App {
         String urlFormatada = url.startsWith("http") ? url : "https://" + url;
         System.out.println("\nVerificando...");
 
-        if (CHECKER.isSiteUp(urlFormatada)) {
+        if (HttpChecker.isSiteUp(urlFormatada)) {
             System.out.println("STATUS: ONLINE [" + urlFormatada + "]");
         } else {
             System.out.println("STATUS: OFFLINE ou inacessível");

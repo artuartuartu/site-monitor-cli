@@ -6,7 +6,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class HttpChecker {
+public final class HttpChecker {
     /** Tempo limite para a conexão em segundos. */
     private static final int TIMEOUT_SECONDS = 5;
     /** Código de status que indica que o site está online. */
@@ -17,9 +17,15 @@ public class HttpChecker {
     /** * Cliente HTTP utilizado para enviar as requisições de verificação.
      * Configurado para seguir redirecionamentos automaticamente.
      */
-    private final HttpClient client = HttpClient.newBuilder()
+    private static final HttpClient CLIENT = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .build();
+
+    private HttpChecker() {
+        throw new UnsupportedOperationException(
+                "Esta é uma classe utilitária e não pode ser instanciada.");
+    }
+
 
     /**
      * Verifica se um site está online enviando uma requisição HTTP HEAD.
@@ -27,7 +33,7 @@ public class HttpChecker {
      * @return true se o site retornar um código de status de sucesso,
      * false caso o site esteja fora do ar ou ocorra um erro de conexão.
      */
-    public boolean isSiteUp(final String url) {
+    public static boolean isSiteUp(final String url) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -35,7 +41,7 @@ public class HttpChecker {
                     .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                     .build();
 
-            HttpResponse<Void> response = client.send(request,
+            HttpResponse<Void> response = CLIENT.send(request,
                     HttpResponse.BodyHandlers.discarding());
 
             return response.statusCode() >= STATUS_OK
