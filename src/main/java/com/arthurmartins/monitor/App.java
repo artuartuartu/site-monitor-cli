@@ -2,31 +2,63 @@ package com.arthurmartins.monitor;
 
 import java.util.Scanner;
 import java.util.List;
-import java.util.ArrayList;
 
-public class App {
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final httpChecker checker = new httpChecker();
-    public static boolean continuar = true;
+public final class App {
+    /** Scanner para leitura de entradas do usuário via console. */
+    private static final Scanner SCANNER = new Scanner(System.in);
+    /** Instância do verificador HTTP para validar o status dos sites. */
+    private static final HttpChecker CHECKER = new HttpChecker();
+    /** Variável para gerir o fluxo do prograna. */
+    private static boolean continuar = true;
 
-    public static void main(String[] args) {
+    /**
+     * Método para acessar e retornar o valor da variável "continuar".
+     *
+     * @return true para o programa continuar, false para finalizar o programa.
+     */
+    public static boolean getContinuar() {
+        return continuar;
+    }
+
+    /**
+     * Método para acessar e alterar o valor da variável "continuar".
+     *
+     * @param valor Novo valor para a variável "continuar".
+     */
+    public static void setContinuar(final boolean valor) {
+        continuar = valor;
+    }
+    private App() {
+        throw new UnsupportedOperationException(
+                "Esta é uma classe utilitária e não pode ser instanciada.");
+    }
+
+    /**
+     * Ponto de entrada principal da aplicação. Gerencia o loop do menu.
+     *
+     * @param args Argumentos de linha de comando (não utilizados).
+     */
+    public static void main(final String[] args) {
         exibirBanner();
 
-        while (continuar) {
+        while (getContinuar()) {
             exibirMenu();
 
-            if (!scanner.hasNextLine()) break;
+            if (!SCANNER.hasNextLine()) {
+                break;
+            }
 
-            String opcao = scanner.nextLine();
+            String opcao = SCANNER.nextLine();
 
             switch (opcao) {
                 case "1" -> processarUrl();
                 case "2" -> processarArquivo();
                 case "0" -> {
                     System.out.println("\nEncerrando...");
-                    continuar = false;
+                    setContinuar(false);
                 }
-                default -> System.out.println("\nOpção inválida! Tente novamente.");
+                default -> System.out.println(
+                        "\nOpção inválida! Tente novamente.");
             }
         }
     }
@@ -41,7 +73,7 @@ public class App {
 
     private static void processarArquivo() {
         System.out.print("\nDigite o nome do arquivo (ex: sites.txt): ");
-        String nomeArquivo = scanner.nextLine();
+        String nomeArquivo = SCANNER.nextLine();
 
         List<String> sites = FileScanner.readSites(nomeArquivo);
 
@@ -57,7 +89,7 @@ public class App {
             }
             System.out.println("--- Verificação Concluída ---");
         }
-        continuar = false;
+        setContinuar(false);
     }
 
     private static void exibirMenu() {
@@ -70,7 +102,7 @@ public class App {
 
     private static void processarUrl() {
         System.out.print("\nDigite a URL para verificar (ex: google.com): ");
-        String url = scanner.nextLine();
+        String url = SCANNER.nextLine();
 
         if (url.isBlank()) {
             System.out.println(" Erro: A URL não pode estar vazia.");
@@ -80,15 +112,15 @@ public class App {
         validarSite(url);
     }
 
-    private static void validarSite(String url) {
+    private static void validarSite(final String url) {
         String urlFormatada = url.startsWith("http") ? url : "https://" + url;
         System.out.println("\nVerificando...");
 
-        if (checker.isSiteUp(urlFormatada)) {
+        if (CHECKER.isSiteUp(urlFormatada)) {
             System.out.println("STATUS: ONLINE [" + urlFormatada + "]");
         } else {
             System.out.println("STATUS: OFFLINE ou inacessível");
         }
-        continuar = false;
+        setContinuar(false);
     }
 }
