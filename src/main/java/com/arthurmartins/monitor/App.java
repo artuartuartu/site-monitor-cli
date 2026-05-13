@@ -116,6 +116,7 @@ public final class App {
 
         if (HttpChecker.isSiteUp(urlFormatada)) {
             System.out.println("STATUS: ONLINE [" + urlFormatada + "]");
+            HttpChecker.showLocation(urlFormatada);
         } else {
             System.out.println("STATUS: OFFLINE ou inacessível "
                     +
