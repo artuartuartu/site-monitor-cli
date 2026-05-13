@@ -25,4 +25,25 @@ public class SiteMonitorTest {
         assertTrue(sites.isEmpty(), "A lista deve estar vazia para arquivos inexistentes");
     }
 
+    @Test
+    void testIntegracaoIpApi() throws Exception {
+        final int statusCodeEsperado = 200;
+        final String urlTeste = "http://ip-api.com/json/google.com";
+        
+        java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(urlTeste))
+                .GET()
+                .build();
+
+        java.net.http.HttpResponse<String> response = client.send(
+                request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        org.junit.jupiter.api.Assertions.assertEquals(statusCodeEsperado, 
+                response.statusCode(), "A API está acessível.");
+        
+        org.junit.jupiter.api.Assertions.assertTrue(response.body().contains("success"), 
+                "A API deve retornar um JSON de sucesso.");
+    }
+
 }

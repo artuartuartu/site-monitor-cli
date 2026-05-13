@@ -1,5 +1,7 @@
 package com.arthurmartins.monitor;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -56,6 +58,45 @@ public final class HttpChecker {
 
         } catch (Exception e) {
             return false;
+        }
+    }
+    /**
+     * Obtém e exibe a localização geográfica do servidor do domínio fornecido.
+     *
+     * @param url A URL do site para verificar a localização.
+     */
+    public static void showLocation(final String url) {
+        final int successCode = 200;
+        try {
+            String domain = url.replace("https://", "")
+                    .replace("http://", "")
+                    .split("/")[0];
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://ip-api.com/json/" + domain))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == successCode) {
+                JsonObject json =
+                        JsonParser.parseString(
+                                response.body()).getAsJsonObject();
+
+                if ("success".equals(json.get("status").getAsString())) {
+                    String city = json.get("city").getAsString();
+                    String country = json.get("country").getAsString();
+                    String isp = json.get("isp").getAsString();
+
+                    System.out.println("Localização: " + city + ", " + country);
+                    System.out.println("Provedor: " + isp);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Não foi possível obter dados de localização.");
         }
     }
 }
